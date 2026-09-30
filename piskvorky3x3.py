@@ -1,10 +1,3 @@
-"""Piškvorky 3 × 3 – grafická verzia (tkinter).
-
-Python prepis webovej hry piskvorky3x3.html.
-Dvaja hráči alebo proti jednoduchému počítaču.
-Spustenie:  python piskvorky3x3.py
-"""
-
 import random
 import tkinter as tk
 
@@ -99,7 +92,6 @@ class Piskvorky(tk.Tk):
 
         self.zmen_rezim("dvaja")
 
-    # ---------- priebeh hry ----------
     def zmen_rezim(self, rezim):
         self.rezim = rezim
         for kluc, t in self.tlacidla_rezimu.items():
