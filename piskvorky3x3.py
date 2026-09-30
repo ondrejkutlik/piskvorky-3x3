@@ -2,15 +2,15 @@ import random
 import tkinter as tk
 
 VYHERNE_RADY = [
-    (0, 1, 2), (3, 4, 5), (6, 7, 8),  # riadky
-    (0, 3, 6), (1, 4, 7), (2, 5, 8),  # stĺpce
-    (0, 4, 8), (2, 4, 6),             # uhlopriečky
+    (0, 1, 2), (3, 4, 5), (6, 7, 8),  # Riadky
+    (0, 3, 6), (1, 4, 7), (2, 5, 8),  # Stĺpce
+    (0, 4, 8), (2, 4, 6),             # Uhlopriečky
 ]
 
 FARBY = {
-    "bg": "#f2f4f7", "surface": "#ffffff", "ink": "#172033", "muted": "#5a6478",
-    "cell": "#eef1f6", "cell_hover": "#e0e5ef", "x": "#1f4bd8", "o": "#d4572a",
-    "win": "#cfeecf", "accent": "#1f4bd8", "accent_ink": "#ffffff",
+    "pozadie": "#f2f4f7", "panel": "#ffffff", "text": "#172033", "sive": "#5a6478",
+    "policko": "#eef1f6", "policko_nad": "#e0e5ef", "x": "#1f4bd8", "o": "#d4572a",
+    "vyhra": "#cfeecf", "akcent": "#1f4bd8", "akcent_nad": "#3a63e6", "akcent_text": "#ffffff",
 }
 
 
@@ -22,8 +22,8 @@ def najdi_vyhru(d):
     return None
 
 
+# Počítač najprv skúsi vyhrať, potom zablokovať súpera, potom stred, inak náhodne
 def tah_pocitaca(doska):
-    """Jednoduchá AI: 1. vyhraj, 2. zablokuj súpera, 3. stred, 4. náhodné políčko."""
     volne = [i for i, z in enumerate(doska) if not z]
     for znak in ("O", "X"):
         for i in volne:
@@ -42,20 +42,20 @@ class Piskvorky(tk.Tk):
         super().__init__()
         self.title("Piškvorky")
         self.resizable(False, False)
-        self.configure(bg=FARBY["bg"], padx=16, pady=16)
+        self.configure(bg=FARBY["pozadie"], padx=16, pady=16)
 
         self.skore = {"X": 0, "O": 0, "remiza": 0}
         self.rezim = "dvaja"
         self.casovac = None
 
-        ram = tk.Frame(self, bg=FARBY["surface"], padx=20, pady=16)
+        ram = tk.Frame(self, bg=FARBY["panel"], padx=20, pady=16)
         ram.pack()
 
-        tk.Label(ram, text="Piškvorky", bg=FARBY["surface"], fg=FARBY["ink"],
+        tk.Label(ram, text="Piškvorky", bg=FARBY["panel"], fg=FARBY["text"],
                  font=("Segoe UI", 18, "bold")).pack(pady=(0, 10))
 
         # Výber režimu
-        rezimy = tk.Frame(ram, bg=FARBY["surface"])
+        rezimy = tk.Frame(ram, bg=FARBY["panel"])
         rezimy.pack(pady=(0, 10))
         self.tlacidla_rezimu = {}
         for kluc, popis in (("dvaja", "Dvaja hráči"), ("pocitac", "Proti počítaču")):
@@ -64,30 +64,30 @@ class Piskvorky(tk.Tk):
             t.pack(side="left", padx=3)
             self.tlacidla_rezimu[kluc] = t
 
-        self.stav = tk.Label(ram, bg=FARBY["surface"], fg=FARBY["ink"],
+        self.stav = tk.Label(ram, bg=FARBY["panel"], fg=FARBY["text"],
                              font=("Segoe UI", 12, "bold"))
         self.stav.pack(pady=(0, 8))
 
         # Doska
-        mriezka = tk.Frame(ram, bg=FARBY["surface"])
+        mriezka = tk.Frame(ram, bg=FARBY["panel"])
         mriezka.pack()
         self.policka = []
         for i in range(9):
             p = tk.Button(mriezka, text="", width=3, height=1, bd=0, relief="flat",
-                          font=("Segoe UI", 36, "bold"), bg=FARBY["cell"],
-                          activebackground=FARBY["cell_hover"], cursor="hand2",
+                          font=("Segoe UI", 36, "bold"), bg=FARBY["policko"],
+                          activebackground=FARBY["policko_nad"], cursor="hand2",
                           command=lambda i=i: self.tah_hraca(i))
             p.grid(row=i // 3, column=i % 3, padx=4, pady=4)
             self.policka.append(p)
 
         # Skóre
-        self.skore_text = tk.Label(ram, bg=FARBY["surface"], fg=FARBY["muted"],
+        self.skore_text = tk.Label(ram, bg=FARBY["panel"], fg=FARBY["sive"],
                                    font=("Segoe UI", 11))
         self.skore_text.pack(pady=10)
 
         tk.Button(ram, text="Nová hra", bd=0, padx=18, pady=6, cursor="hand2",
-                  bg=FARBY["accent"], fg=FARBY["accent_ink"],
-                  activebackground="#3a63e6", activeforeground=FARBY["accent_ink"],
+                  bg=FARBY["akcent"], fg=FARBY["akcent_text"],
+                  activebackground=FARBY["akcent_nad"], activeforeground=FARBY["akcent_text"],
                   font=("Segoe UI", 11, "bold"), command=self.nova_hra).pack()
 
         self.zmen_rezim("dvaja")
@@ -96,8 +96,8 @@ class Piskvorky(tk.Tk):
         self.rezim = rezim
         for kluc, t in self.tlacidla_rezimu.items():
             aktivny = kluc == rezim
-            t.config(bg=FARBY["accent"] if aktivny else FARBY["cell"],
-                     fg=FARBY["accent_ink"] if aktivny else FARBY["muted"])
+            t.config(bg=FARBY["akcent"] if aktivny else FARBY["policko"],
+                     fg=FARBY["akcent_text"] if aktivny else FARBY["sive"])
         self.skore = {"X": 0, "O": 0, "remiza": 0}
         self.aktualizuj_skore()
         self.nova_hra()
@@ -120,7 +120,7 @@ class Piskvorky(tk.Tk):
                 text=znak,
                 fg=FARBY["x"] if znak == "X" else FARBY["o"],
                 disabledforeground=FARBY["x"] if znak == "X" else FARBY["o"],
-                bg=FARBY["win"] if i in vyherny_rad else FARBY["cell"],
+                bg=FARBY["vyhra"] if i in vyherny_rad else FARBY["policko"],
                 state="disabled" if self.koniec or znak else "normal",
             )
 
@@ -133,7 +133,7 @@ class Piskvorky(tk.Tk):
             self.koniec = True
             self.skore[znak] += 1
             self.vykresli(rad)
-            self.stav.config(text=f"Vyhráva {znak}! 🎉")
+            self.stav.config(text=f"Vyhráva {znak}!")
             self.aktualizuj_skore()
             return
 
@@ -156,7 +156,7 @@ class Piskvorky(tk.Tk):
 
         if self.rezim == "pocitac" and not self.koniec:
             self.blokovane = True
-            self.stav.config(text="Počítač premýšľa…")
+            self.stav.config(text="Počítač premýšľa...")
             self.casovac = self.after(450, self.tah_pocitaca)
 
     def tah_pocitaca(self):
